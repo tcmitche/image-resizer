@@ -1,0 +1,23 @@
+{
+  "name": "image-resizer",
+  "version": "1.0.0",
+  "description": "An app to resize all images in a folder.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js",
+    "build": "./node_modules/babel-cli/bin/babel.js src -d dist"
+  },
+  "author": "Travis Mitchell",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.4.0",
+    "babel-plugin-syntax-jsx": "^6.3.13",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.4.0",
+    "babel-plugin-transform-react-jsx": "^6.4.0",
+    "electron-prebuilt": "^0.36.0"
+  },
+  "dependencies": {
+    "react-redux": "^4.0.6",
+    "redux": "^3.0.5"
+  }
+}
