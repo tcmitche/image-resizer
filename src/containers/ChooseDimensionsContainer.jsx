@@ -2,26 +2,30 @@ import { ipcRenderer } from 'electron'
 import { Component } from 'react'
 import { connect } from 'react-redux'
 
-import ChooseFolder from '../components/ChooseFolder'
-import { increment } from '../actionCreators'
+import ChooseDimensions from '../components/ChooseDimensions'
 import store from '../store'
-import { setSourceFolder } from '../actionCreators'
-
-ipcRenderer.on('source-folder-chosen', function(event, arg) {
-  store.dispatch(setSourceFolder(arg))
-});
+import { setMaxHeight, setMaxWidth } from '../actionCreators'
 
 // Which part of the Redux global state does our component want to receive as props?
 function mapStateToProps(state) {
   return {
-    message: 'choose-source-folder',
-    value: state.sourceFolder
+    maxHeight: state.maxHeight,
+    maxWidth: state.maxWidth,
+  }
+}
+
+// Which action creators does it want to receive by props?
+function mapDispatchToProps(dispatch) {
+  return {
+    onHeightChange: (height) => dispatch(setMaxHeight(height)),
+    onWidthChange: (width) => dispatch(setMaxWidth(width))
   }
 }
 
 export default connect(
-  mapStateToProps
-)(ChooseFolder)
+  mapStateToProps,
+  mapDispatchToProps
+)(ChooseDimensions)
 
 // You can also pass an object instead of defining `mapDispatchToProps`:
 // export default connect(mapStateToProps, CounterActionCreators)(Counter);

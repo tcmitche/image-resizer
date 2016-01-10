@@ -5,17 +5,17 @@ import { connect } from 'react-redux'
 import ChooseFolder from '../components/ChooseFolder'
 import { increment } from '../actionCreators'
 import store from '../store'
-import { setSourceFolder } from '../actionCreators'
+import { setDestFolder } from '../actionCreators'
 
-ipcRenderer.on('source-folder-chosen', function(event, arg) {
-  store.dispatch(setSourceFolder(arg))
+ipcRenderer.on('dest-folder-chosen', function(event, arg) {
+  store.dispatch(setDestFolder(arg))
 });
 
 // Which part of the Redux global state does our component want to receive as props?
 function mapStateToProps(state) {
   return {
-    message: 'choose-source-folder',
-    value: state.sourceFolder
+    message: 'choose-dest-folder',
+    value: state.destFolder
   }
 }
 

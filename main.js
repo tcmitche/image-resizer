@@ -1,6 +1,9 @@
 'use strict';
 
 const electron = require('electron');
+const walk = require('walk');
+const jimp = require('jimp');
+const _ = require('lodash')
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
@@ -13,17 +16,67 @@ let mainWindow;
 const ipcMain = electron.ipcMain;
 const dialog = electron.dialog;
 
-function sendChosenFolder(event, folder_path) {
-  event.sender.send('folder-chosen', folder_path)
+function sendSourceFolder(event, folder_path) {
+  event.sender.send('source-folder-chosen', folder_path[0])
 }
 
-ipcMain.on('open-folder-dialog', function(event) {
+ipcMain.on('choose-source-folder', function(event) {
   dialog.showOpenDialog(
     mainWindow,
     { properties: [ 'openDirectory' ]},
     function(val) {
-      sendChosenFolder(event, val)
+      sendSourceFolder(event, val)
     });
+});
+
+function sendDestFolder(event, folder_path) {
+  event.sender.send('dest-folder-chosen', folder_path && folder_path[0])
+}
+
+ipcMain.on('choose-dest-folder', function(event) {
+  dialog.showOpenDialog(
+    mainWindow,
+    { properties: [ 'openDirectory' ]},
+    function(val) {
+      sendDestFolder(event, val)
+    });
+});
+
+ipcMain.on('resize', function(event, arg) {
+  if (!(arg.sourceFolder && arg.destFolder)) return
+  // Read all files in source
+  var files = [];
+
+  // Walker options
+  var walker = walk.walk(arg.sourceFolder, { followLinks: false });
+
+  walker.on('file', function(root, stat, next) {
+      // Add this file to the list of files
+      files.push({
+        root: root,
+        name: stat.name
+      });
+      next();
+  });
+
+  walker.on('end', function() {
+    // Map the files to an array of promises, use .all to send finished message
+    // back to ui.
+    _.each(files, function(f) {
+      jimp.read(f.root + '/' + f.name).then(function(img) {
+        var w = arg.maxWidth
+        var h = arg.maxHeight
+        var factor = (w/h > img.bitmap.width/img.bitmap.height) ?
+        h/img.bitmap.height : w/img.bitmap.width;
+        img.clone()
+          .scale(factor)
+          .write(arg.destFolder + '/' + f.name)
+      }).catch(function (err) {
+        console.error(err);
+      });
+    });
+  });
+
 });
 
 function createWindow () {

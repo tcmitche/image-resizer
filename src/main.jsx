@@ -1,34 +1,27 @@
 'use strict';
-import { ipcRenderer } from 'electron'
 import ReactDOM from 'react-dom'
 import React, { Component } from 'react'
 import { Provider } from 'react-redux'
 import SourceFolder from './containers/SourceFolderContainer'
+import DestFolder from './containers/DestFolderContainer'
+import ChooseDimensions from './containers/ChooseDimensionsContainer'
 import store from './store'
-import { setStoreFolder } from './actionCreators'
+import { ipcRenderer } from 'electron'
 
-ipcRenderer.on('folder-chosen', function(event, arg) {
-  store.dispatch(setStoreFolder(arg[0]))
-});
-
-store.subscribe(() => {
-    console.log('loggin state')
-    console.log(store.getState())
-  }
-)
+window.store = store
+function resize() {
+  ipcRenderer.send('resize', store.getState())
+}
 
 var App = React.createClass({
-  getInitialState: function() {
-    return store.getState();
-  },
-  handleChange: function() {
-    console.log('handleChange', store.getState())
-    this.setState(store.getState());
-  },
   render: function() {
     return (
       <div>
-        <SourceFolder />
+        <h1>Image Resizr</h1>
+        <SourceFolder label="Select the directory containing the images." />
+        <DestFolder label="Select the directory to put the resized images in." />
+        <ChooseDimensions />
+        <button className="btn btn-primary btn-lg btn-block" onClick={resize}>Resize!</button>
       </div>
     )
   }
